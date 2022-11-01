@@ -15,10 +15,6 @@ type Options struct {
 	// Defaults to -1.
 	Lifetime time.Duration
 
-	// ExpirationHook is a function that is called when the cache expires.
-	// If nil is set, the cache will not call the function.
-	ExpirationHook func()
-
 	// FileSystem is a filesystem that is used to store the cache file.
 	FileSystem FileSystem
 
@@ -27,4 +23,7 @@ type Options struct {
 
 	// Decoder is the decoder to use for the cache.
 	Decoder Decoder
+
+	// ExpirationHook is a function that is called when the cache expires.
+	ExpirationHook func()
 }

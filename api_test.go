@@ -2,11 +2,12 @@ package gache
 
 import (
 	"os"
+	"sync"
 	"testing"
 	"time"
 )
 
-const testpath = "test/api_test.json"
+const testpath = "test/test.json"
 
 func init() {
 	clear()
@@ -137,23 +138,83 @@ func testCrossSession(t *testing.T) {
 	if value != "hello" {
 		t.Errorf("Gache.Get() = %v, want %v", value, "hello")
 	}
+}
 
-	clear()
+func testGetConcurrent(t *testing.T, g *Gache[string]) {
+	t.Helper()
+
+	const v = "test"
+
+	err := g.Set(v)
+	if err != nil {
+		t.Fatalf("Gache.Set() error = %v, wantErr %v", err, nil)
+	}
+
+	// when getting value from cache concurrently
+	// the value should be "test" for all of them
+	wg := sync.WaitGroup{}
+	wg.Add(100)
+	for i := 0; i < 100; i++ {
+		go func() {
+			defer wg.Done()
+			value, _, err := g.Get()
+			if err != nil {
+				t.Errorf("Gache.Get() error = %v, wantErr %v", err, nil)
+				return
+			}
+
+			if value != v {
+				t.Errorf("Gache.Get() = %v, want %v", value, v)
+			}
+		}()
+	}
+	wg.Wait()
+}
+
+func testSetConcurrent(t *testing.T, g *Gache[string]) {
+	t.Helper()
+
+	wg := sync.WaitGroup{}
+	wg.Add(100)
+	for i := 0; i < 100; i++ {
+		go func() {
+			defer wg.Done()
+			err := g.Set("test")
+			if err != nil {
+				t.Errorf("Gache.Set() error = %v, wantErr %v", err, nil)
+			}
+		}()
+	}
+	wg.Wait()
 }
 
 func TestGache_EmptyGet(t *testing.T) {
 	testEmptyGet(t, New[string](&Options{}))
 	testEmptyGet(t, New[string](&Options{Path: testpath}))
+
+	testGetConcurrent(t, New[string](&Options{}))
+	testGetConcurrent(t, New[string](&Options{Path: testpath}))
 }
 
 func TestGache_Set(t *testing.T) {
 	testSet(t, New[string](&Options{}))
-	testSetExpire(t, New[string](&Options{Lifetime: time.Second}))
+	clear()
+
+	testSetExpire(t, New[string](&Options{Lifetime: time.Millisecond}))
+	clear()
 
 	testSet(t, New[string](&Options{Path: testpath}))
 	clear()
-	testSetExpire(t, New[string](&Options{Path: testpath, Lifetime: time.Second}))
+
+	testSetExpire(t, New[string](&Options{Path: testpath, Lifetime: time.Millisecond}))
 	clear()
 
 	testCrossSession(t)
+	clear()
+
+	testSetConcurrent(t, New[string](&Options{}))
+	clear()
+
+	testSetConcurrent(t, New[string](&Options{Path: testpath}))
+	clear()
 }
