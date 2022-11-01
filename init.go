@@ -1,6 +1,6 @@
 package gache
 
-func (g *Gache[T]) init() error {
+func (g *Cache[T]) init() error {
 	if g.initialized {
 		return nil
 	}

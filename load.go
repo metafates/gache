@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 )
 
-func (g *Gache[T]) load() error {
+func (g *Cache[T]) load() error {
 	if g.options.Path == "" {
 		return nil
 	}

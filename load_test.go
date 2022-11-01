@@ -13,7 +13,7 @@ func TestLoad(t *testing.T) {
 	g := New[string](&Options{Path: testpath})
 
 	if g.data.Internal != "" {
-		t.Fatalf("Gache.data.Internal = %v, want %v", g.data.Internal, "")
+		t.Fatalf("Cache.data.Internal = %v, want %v", g.data.Internal, "")
 	}
 
 	// when
@@ -21,11 +21,11 @@ func TestLoad(t *testing.T) {
 
 	// then
 	if err != nil {
-		t.Errorf("Gache.load() error = %v, wantErr %v", err, nil)
+		t.Errorf("Cache.load() error = %v, wantErr %v", err, nil)
 	}
 
 	if g.data.Internal != "test" {
-		t.Errorf("Gache.data.Internal = %v, want %v", g.data.Internal, "test")
+		t.Errorf("Cache.data.Internal = %v, want %v", g.data.Internal, "test")
 	}
 
 	clear()
@@ -38,7 +38,7 @@ func TestLoadMalformed(t *testing.T) {
 	g := New[string](&Options{Path: testpath})
 
 	if g.data.Internal != "" {
-		t.Fatalf("Gache.data.Internal = %v, want %v", g.data.Internal, "")
+		t.Fatalf("Cache.data.Internal = %v, want %v", g.data.Internal, "")
 	}
 
 	// when
@@ -46,11 +46,11 @@ func TestLoadMalformed(t *testing.T) {
 
 	// then
 	if err != nil {
-		t.Errorf("Gache.load() error = %v, wantErr %v", err, nil)
+		t.Errorf("Cache.load() error = %v, wantErr %v", err, nil)
 	}
 
 	if g.data.Internal != "" {
-		t.Errorf("Gache.data.Internal = %v, want %v", g.data.Internal, "")
+		t.Errorf("Cache.data.Internal = %v, want %v", g.data.Internal, "")
 	}
 
 	clear()
@@ -63,7 +63,7 @@ func TestLoadExpired(t *testing.T) {
 	g := New[string](&Options{Path: testpath, Lifetime: time.Hour})
 
 	if g.data.Internal != "" {
-		t.Fatalf("Gache.data.Internal = %v, want %v", g.data.Internal, "")
+		t.Fatalf("Cache.data.Internal = %v, want %v", g.data.Internal, "")
 	}
 
 	// when
@@ -71,11 +71,11 @@ func TestLoadExpired(t *testing.T) {
 
 	// then
 	if err != nil {
-		t.Errorf("Gache.load() error = %v, wantErr %v", err, nil)
+		t.Errorf("Cache.load() error = %v, wantErr %v", err, nil)
 	}
 
 	if g.data.Internal != "" {
-		t.Errorf("Gache.data.Internal = %v, want %v", g.data.Internal, "")
+		t.Errorf("Cache.data.Internal = %v, want %v", g.data.Internal, "")
 	}
 
 	clear()

@@ -17,7 +17,7 @@ func clear() {
 	_ = os.Remove(testpath)
 }
 
-func testEmptyGet(t *testing.T, g *Gache[string]) {
+func testEmptyGet(t *testing.T, g *Cache[string]) {
 	t.Helper()
 
 	// when get value from empty string cache
@@ -25,16 +25,16 @@ func testEmptyGet(t *testing.T, g *Gache[string]) {
 
 	// error should be nil
 	if err != nil {
-		t.Fatalf("Gache.Get() error = %v, wantErr %v", err, nil)
+		t.Fatalf("Cache.Get() error = %v, wantErr %v", err, nil)
 	}
 
 	// value should be empty string
 	if value != "" {
-		t.Errorf("Gache.Get() = %v, want %v", value, "")
+		t.Errorf("Cache.Get() = %v, want %v", value, "")
 	}
 }
 
-func testSetExpire(t *testing.T, g *Gache[string]) {
+func testSetExpire(t *testing.T, g *Cache[string]) {
 	t.Helper()
 
 	// given a cache with lifetime of
@@ -47,7 +47,7 @@ func testSetExpire(t *testing.T, g *Gache[string]) {
 
 	// error should be nil
 	if err != nil {
-		t.Fatalf("Gache.Set() error = %v, wantErr %v", err, nil)
+		t.Fatalf("Cache.Set() error = %v, wantErr %v", err, nil)
 	}
 
 	// when getting value from cache
@@ -55,12 +55,12 @@ func testSetExpire(t *testing.T, g *Gache[string]) {
 
 	// error should be nil
 	if err != nil {
-		t.Fatalf("Gache.Get() error = %v, wantErr %v", err, nil)
+		t.Fatalf("Cache.Get() error = %v, wantErr %v", err, nil)
 	}
 
 	// value should be "test"
 	if value != v {
-		t.Errorf("Gache.Get() = %v, want %v", value, v)
+		t.Errorf("Cache.Get() = %v, want %v", value, v)
 	}
 
 	// if lifetime is not infinite (values below 0 are considered infinite lifetime)
@@ -74,21 +74,21 @@ func testSetExpire(t *testing.T, g *Gache[string]) {
 
 	// err should be nil
 	if err != nil {
-		t.Fatalf("Gache.Get() error = %v, wantErr %v", err, nil)
+		t.Fatalf("Cache.Get() error = %v, wantErr %v", err, nil)
 	}
 
 	// expired should be true
 	if !expired {
-		t.Errorf("Gache.Get() expired = %v, want %v", expired, true)
+		t.Errorf("Cache.Get() expired = %v, want %v", expired, true)
 	}
 
 	// value should be empty string
 	if value != "" {
-		t.Errorf("Gache.Get() = %v, want %v", value, "")
+		t.Errorf("Cache.Get() = %v, want %v", value, "")
 	}
 }
 
-func testSet(t *testing.T, g *Gache[string]) {
+func testSet(t *testing.T, g *Cache[string]) {
 	t.Helper()
 
 	// when set value to empty string cache
@@ -96,7 +96,7 @@ func testSet(t *testing.T, g *Gache[string]) {
 
 	// error should be nil
 	if err != nil {
-		t.Fatalf("Gache.Set() error = %v, wantErr %v", err, nil)
+		t.Fatalf("Cache.Set() error = %v, wantErr %v", err, nil)
 	}
 
 	// when getting value from cache
@@ -104,19 +104,19 @@ func testSet(t *testing.T, g *Gache[string]) {
 
 	// error should be nil
 	if err != nil {
-		t.Fatalf("Gache.Get() error = %v, wantErr %v", err, nil)
+		t.Fatalf("Cache.Get() error = %v, wantErr %v", err, nil)
 	}
 
 	// value should be "test"
 	if value != "test" {
-		t.Errorf("Gache.Get() = %v, want %v", value, "test")
+		t.Errorf("Cache.Get() = %v, want %v", value, "test")
 	}
 }
 
 func testCrossSession(t *testing.T) {
 	t.Helper()
 
-	mkCache := func() *Gache[string] {
+	mkCache := func() *Cache[string] {
 		return New[string](&Options{Path: testpath})
 	}
 
@@ -124,7 +124,7 @@ func testCrossSession(t *testing.T) {
 
 	err := cache.Set("hello")
 	if err != nil {
-		t.Fatalf("Gache.Set() error = %v, wantErr %v", err, nil)
+		t.Fatalf("Cache.Set() error = %v, wantErr %v", err, nil)
 	}
 
 	// reset cache
@@ -132,22 +132,22 @@ func testCrossSession(t *testing.T) {
 
 	value, _, err := cache.Get()
 	if err != nil {
-		t.Fatalf("Gache.Get() error = %v, wantErr %v", err, nil)
+		t.Fatalf("Cache.Get() error = %v, wantErr %v", err, nil)
 	}
 
 	if value != "hello" {
-		t.Errorf("Gache.Get() = %v, want %v", value, "hello")
+		t.Errorf("Cache.Get() = %v, want %v", value, "hello")
 	}
 }
 
-func testGetConcurrent(t *testing.T, g *Gache[string]) {
+func testGetConcurrent(t *testing.T, g *Cache[string]) {
 	t.Helper()
 
 	const v = "test"
 
 	err := g.Set(v)
 	if err != nil {
-		t.Fatalf("Gache.Set() error = %v, wantErr %v", err, nil)
+		t.Fatalf("Cache.Set() error = %v, wantErr %v", err, nil)
 	}
 
 	// when getting value from cache concurrently
@@ -159,19 +159,19 @@ func testGetConcurrent(t *testing.T, g *Gache[string]) {
 			defer wg.Done()
 			value, _, err := g.Get()
 			if err != nil {
-				t.Errorf("Gache.Get() error = %v, wantErr %v", err, nil)
+				t.Errorf("Cache.Get() error = %v, wantErr %v", err, nil)
 				return
 			}
 
 			if value != v {
-				t.Errorf("Gache.Get() = %v, want %v", value, v)
+				t.Errorf("Cache.Get() = %v, want %v", value, v)
 			}
 		}()
 	}
 	wg.Wait()
 }
 
-func testSetConcurrent(t *testing.T, g *Gache[string]) {
+func testSetConcurrent(t *testing.T, g *Cache[string]) {
 	t.Helper()
 
 	wg := sync.WaitGroup{}
@@ -181,7 +181,7 @@ func testSetConcurrent(t *testing.T, g *Gache[string]) {
 			defer wg.Done()
 			err := g.Set("test")
 			if err != nil {
-				t.Errorf("Gache.Set() error = %v, wantErr %v", err, nil)
+				t.Errorf("Cache.Set() error = %v, wantErr %v", err, nil)
 			}
 		}()
 	}

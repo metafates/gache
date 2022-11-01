@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func (g *Gache[T]) save() error {
+func (g *Cache[T]) save() error {
 	// do nothing if we use in-memory caching
 	if g.options.Path == "" {
 		return nil

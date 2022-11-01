@@ -8,7 +8,7 @@ import (
 // If initialization or marshalling fails, it will return an error.
 // In memory-only mode it will never fail.
 // It will restart the cache's lifetime.
-func (g *Gache[T]) Set(value T) error {
+func (g *Cache[T]) Set(value T) error {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 
@@ -34,7 +34,7 @@ func (g *Gache[T]) Set(value T) error {
 // Get returns the value of the cache.
 // If initialization fails, it will return an error.
 // In memory-only mode it will never fail.
-func (g *Gache[T]) Get() (cached T, expired bool, err error) {
+func (g *Cache[T]) Get() (cached T, expired bool, err error) {
 	g.mutex.RLock()
 	defer g.mutex.RUnlock()
 
