@@ -39,6 +39,7 @@ var cache = gache.New[map[string]*Pokemon](&gache.Options{
 	Lifetime: time.Hour,
 })
 
+// getPokemon will get a pokemon by name from API
 // Gonna Cache Em' All!
 func getPokemon(name string) (*Pokemon, error) {
 	// check if Pokémon is in cache
