@@ -8,8 +8,8 @@ import (
 // chronoData is a struct that contains the data that is stored in the cache file with time of the last update.
 // Used to expire the cache.
 type chronoData[T any] struct {
-	Internal T          `json:"internal"`
-	Time     *time.Time `json:"time,omitempty"`
+	Internal T
+	Time     *time.Time
 }
 
 // Gache is a generic thread-safe cache that can be used to cache any type of data.
@@ -36,6 +36,10 @@ func New[T any](options *Options) *Gache[T] {
 
 	if options.Decoder == nil {
 		options.Decoder = defaultJSONEncoderDecoder{}
+	}
+
+	if options.Lifetime == 0 {
+		options.Lifetime = -1
 	}
 
 	var defaultT T

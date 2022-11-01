@@ -1,13 +1,13 @@
 package gache
 
 import (
-	"errors"
 	"time"
 )
 
 // Set sets the value of the cache.
 // If initialization or marshalling fails, it will return an error.
 // In memory-only mode it will never fail.
+// It will restart the cache's lifetime.
 func (g *Gache[T]) Set(value T) error {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
@@ -17,12 +17,12 @@ func (g *Gache[T]) Set(value T) error {
 		return err
 	}
 
-	// update time
+	// update value
 	g.data.Internal = value
-	if g.data.Time != nil {
-		now := time.Now()
-		g.data.Time = &now
-	}
+
+	// update time
+	now := time.Now()
+	g.data.Time = &now
 
 	if g.options.Path != "" {
 		err = g.save()
@@ -34,22 +34,21 @@ func (g *Gache[T]) Set(value T) error {
 // Get returns the value of the cache.
 // If initialization fails, it will return an error.
 // In memory-only mode it will never fail.
-func (g *Gache[T]) Get() (T, error) {
+func (g *Gache[T]) Get() (cached T, expired bool, err error) {
 	g.mutex.RLock()
 	defer g.mutex.RUnlock()
 
-	err := g.init()
+	err = g.init()
 	if err != nil {
-		var t T
-		return t, err
+		return
 	}
 
-	// Do not use tryExpire() here, because we can't write to the cache
-	// since we RLocked mutex.
+	// Do not use tryExpire() here, because it modifies the cache, but we RLocked mutex.
 	if g.isExpired() {
-		var t T
-		return t, ErrExpired(errors.New("cache expired"))
+		expired = true
+		return
 	}
 
-	return g.data.Internal, nil
+	cached = g.data.Internal
+	return
 }

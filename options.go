@@ -11,8 +11,9 @@ type Options struct {
 	Path string
 
 	// Lifetime is the time duration after which the cache expires.
-	// If nil is set, the cache will never expire.
-	Lifetime *time.Duration
+	// Values below zero are treated as never expiring.
+	// Defaults to -1.
+	Lifetime time.Duration
 
 	// ExpirationHook is a function that is called when the cache expires.
 	// If nil is set, the cache will not call the function.

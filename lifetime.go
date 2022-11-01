@@ -3,9 +3,9 @@ package gache
 import "time"
 
 func (g *Gache[T]) isExpired() bool {
-	return g.options.Lifetime != nil &&
+	return g.options.Lifetime >= 0 &&
 		g.data.Time != nil &&
-		time.Since(*g.data.Time) > *g.options.Lifetime
+		time.Since(*g.data.Time) > g.options.Lifetime
 }
 
 func (g *Gache[T]) tryExpire() error {
