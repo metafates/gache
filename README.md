@@ -5,13 +5,15 @@ Gache is a dead simple file-based (or in-memory) cache library for Go with zero 
 There are great caching libraries out there, but none of them fit my needs or not as simple as I'd like to.
 So I decided to write my own and share it with the world. 🐳
 
-> Work in progress, I wouldn't reccommend using it now
-
 ## Installation
 
 ```bash
 go get github.com/metafates/gache
 ```
+
+## Docs
+
+[Godoc](https://pkg.go.dev/github.com/metafates/gache)
 
 ## Usage Example
 
@@ -48,6 +50,10 @@ func getPokemon(name string) (*Pokemon, error) {
 	pokemons, expired, err := cache.Get()
 	if err != nil {
 		return nil, err
+	}
+	
+	if pokemons == nil {
+	    pokemons = make(map[string]*Pokemon)
 	}
 
 	// if cache is expired, or Pokémon wasn't cached
