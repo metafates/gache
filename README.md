@@ -5,6 +5,8 @@ Gache is a dead simple file-based (or in-memory) cache library for Go with zero 
 There are great caching libraries out there, but none of them fit my needs or not as simple as I'd like to.
 So I decided to write my own and share it with the world. 🐳
 
+> Work in progress, I wouldn't reccommend using it now
+
 ## Installation
 
 ```bash
