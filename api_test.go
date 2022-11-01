@@ -20,7 +20,7 @@ func testEmptyGet(t *testing.T, g *Gache[string]) {
 	t.Helper()
 
 	// when get value from empty string cache
-	value, err := g.Get()
+	value, _, err := g.Get()
 
 	// error should be nil
 	if err != nil {
@@ -50,7 +50,7 @@ func testSetExpire(t *testing.T, g *Gache[string]) {
 	}
 
 	// when getting value from cache
-	value, err := g.Get()
+	value, _, err := g.Get()
 
 	// error should be nil
 	if err != nil {
@@ -69,11 +69,16 @@ func testSetExpire(t *testing.T, g *Gache[string]) {
 	}
 
 	// when getting value from cache
-	value, err = g.Get()
+	value, expired, err := g.Get()
 
 	// err should be nil
 	if err != nil {
 		t.Fatalf("Gache.Get() error = %v, wantErr %v", err, nil)
+	}
+
+	// expired should be true
+	if !expired {
+		t.Errorf("Gache.Get() expired = %v, want %v", expired, true)
 	}
 
 	// value should be empty string
@@ -94,7 +99,7 @@ func testSet(t *testing.T, g *Gache[string]) {
 	}
 
 	// when getting value from cache
-	value, err := g.Get()
+	value, _, err := g.Get()
 
 	// error should be nil
 	if err != nil {
@@ -105,6 +110,35 @@ func testSet(t *testing.T, g *Gache[string]) {
 	if value != "test" {
 		t.Errorf("Gache.Get() = %v, want %v", value, "test")
 	}
+}
+
+func testCrossSession(t *testing.T) {
+	t.Helper()
+
+	mkCache := func() *Gache[string] {
+		return New[string](&Options{Path: testpath})
+	}
+
+	cache := mkCache()
+
+	err := cache.Set("hello")
+	if err != nil {
+		t.Fatalf("Gache.Set() error = %v, wantErr %v", err, nil)
+	}
+
+	// reset cache
+	cache = mkCache()
+
+	value, _, err := cache.Get()
+	if err != nil {
+		t.Fatalf("Gache.Get() error = %v, wantErr %v", err, nil)
+	}
+
+	if value != "hello" {
+		t.Errorf("Gache.Get() = %v, want %v", value, "hello")
+	}
+
+	clear()
 }
 
 func TestGache_EmptyGet(t *testing.T) {
@@ -120,4 +154,6 @@ func TestGache_Set(t *testing.T) {
 	clear()
 	testSetExpire(t, New[string](&Options{Path: testpath, Lifetime: time.Second}))
 	clear()
+
+	testCrossSession(t)
 }
